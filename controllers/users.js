@@ -42,7 +42,7 @@ function createUser(req, res) {
 
 function updateUser(req, res) {
   const {name, about} = req.body;
-  User.findByIdAndUpdate(req.user._id, {name, about})
+  User.findByIdAndUpdate(req.user._id, {name, about}, { new: true })
     .then(user => {
       if (!user) {
         res.status(404).send({ message: `Пользователь не найден` });
@@ -62,7 +62,7 @@ function updateUser(req, res) {
 
 function updateAvatar(req, res) {
   const {avatar} = req.body;
-  User.findByIdAndUpdate(req.user._id, {avatar})
+  User.findByIdAndUpdate(req.user._id, {avatar}, { new: true })
     .then(user => {
       if (!user) {
         res.status(404).send({ message: `Пользователь не найден` });
