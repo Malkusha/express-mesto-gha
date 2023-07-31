@@ -24,12 +24,11 @@ function deleteCardById(req,res) {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      if (!cardId) {
-        res.send({ message: `Карточка не найдена` });
+      if (!card) {
+        return res.send({ message: `Карточка не найдена` });
       }
-     else {
       res.status(200).send({data: card})
-    }})
+    })
     .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
 }
 
@@ -41,11 +40,10 @@ function setLike(req, res) {
   )
   .then((card) => {
     if (!card) {
-      res.send({ message: `Карточка не найдена` });
+      return res.send({ message: `Карточка не найдена` });
     }
-   else {
     res.status(200).send({data: card})
-  }})
+  })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(404).send({ message: `Карточка не найдена` });
@@ -64,11 +62,10 @@ function removeLike(req, res) {
   )
   .then((card) => {
     if (!card) {
-      res.send({ message: `Карточка не найдена` });
+      retrn res.send({ message: `Карточка не найдена` });
     }
-   else {
     res.status(201).send({data: card})
-  }})
+  })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(404).send({ message: `Карточка не найдена` });
