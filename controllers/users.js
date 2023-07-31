@@ -11,7 +11,7 @@ function getUserById(req,res) {
   User.findById(id)
     .then(user => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.code === 404) {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: `Пользователь не найден` });
       }
       else {

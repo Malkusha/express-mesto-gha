@@ -35,7 +35,7 @@ function setLike(req, res) {
   )
     .then(card => res.status(201).send({data: card}))
     .catch((err) => {
-      if (err.code === 404) {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: `Карточка не найдена` });
       }
       else {
@@ -52,7 +52,7 @@ function removeLike(req, res) {
   )
     .then(card => res.status(201).send({data: card}))
     .catch((err) => {
-      if (err.code === 404) {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: `Карточка не найдена` });
       }
       else {
