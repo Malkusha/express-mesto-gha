@@ -17,8 +17,8 @@ function getUserById(req,res) {
 
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: `Пользователь не найден` });
+      if (err.kind === 'ObjectID') {
+        return res.status(400).send({ message: `Пользователь не найден` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
@@ -32,7 +32,7 @@ function createUser(req, res) {
     .then(user => res.status(201).send({data: user}))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Переданы некорректные данные` });
+        return res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
@@ -51,7 +51,7 @@ function updateUser(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Переданы некорректные данные` });
+        return res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
@@ -70,7 +70,7 @@ function updateAvatar(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Переданы некорректные данные` });
+        return res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
