@@ -42,7 +42,7 @@ function createUser(req, res) {
 
 function updateUser(req, res) {
   const {name, about} = req.body;
-  User.findByIdAndUpdate(req.user._id, {name, about}, {new: true})
+  User.findByIdAndUpdate(req.user._id, {name, about}, {new: true, runValidators: true})
     .then(user => {
       if (!user) {
         return res.status(404).send({ message: `Пользователь не найден` });
@@ -51,7 +51,8 @@ function updateUser(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: `Переданы некорректные данные` });
+        console.log(err.name);
+        //return res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
@@ -61,7 +62,7 @@ function updateUser(req, res) {
 
 function updateAvatar(req, res) {
   const {avatar} = req.body;
-  User.findByIdAndUpdate(req.user._id, {avatar}, {new: true })
+  User.findByIdAndUpdate(req.user._id, {avatar}, {new: true, runValidators: true})
     .then(user => {
       if (!user) {
         return res.status(404).send({ message: `Пользователь не найден` });
