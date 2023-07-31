@@ -62,7 +62,7 @@ function removeLike(req, res) {
   )
   .then((card) => {
     if (!card) {
-      retrn res.send({ message: `Карточка не найдена` });
+      return res.send({ message: `Карточка не найдена` });
     }
     res.status(201).send({data: card})
   })
