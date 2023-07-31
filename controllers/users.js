@@ -8,19 +8,18 @@ function getUsers(req, res) {
 };
 
 function getUserById(req,res) {
-  const { id } = req.params;
-  User.findById(id)
+  const { userId } = req.params;
+  User.findById(userId)
     .then(user => {
-      const isValid = mongoose.Types.ObjectId.isValid(id);
-      if (!isValid) {
-        return res.status(400).send({ message: `Некорректный ID` });
-      } else
       if (!user) {
         return res.status(404).send({ message: `Пользователь не найден` });
       }
       res.status(200).send({ data: user })
     })
     .catch((err) => {
+        if (err.name === 'CastError') {
+          return res.status(400).send({ message: `Некорректный ID` });
+        }
         res.status(500).send({ message: `Произошла ошибка ${err}` });
     })
 }
