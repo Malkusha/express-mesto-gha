@@ -25,7 +25,7 @@ function deleteCardById(req,res) {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return res.send({ message: `Карточка не найдена` });
+        return res.status(404).send({ message: `Карточка не найдена` });
       }
       res.send({data: card})
     })
@@ -45,7 +45,7 @@ function setLike(req, res) {
   )
   .then((card) => {
     if (!card) {
-      return res.send({ message: `Карточка не найдена` });
+      return res.status(404).send({ message: `Карточка не найдена` });
     }
     res.send({data: card})
   })
@@ -67,7 +67,7 @@ function removeLike(req, res) {
   )
   .then((card) => {
     if (!card) {
-      return res.send({ message: `Карточка не найдена` });
+      return res.status(404).send({ message: `Карточка не найдена` });
     }
     res.send({data: card})
   })
