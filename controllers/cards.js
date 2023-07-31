@@ -33,8 +33,8 @@ function deleteCardById(req,res) {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: `Некорректный ID карточки` });
       }
-    } res.status(500).send({ message: `Произошла ошибка ${err}` }));
-}
+     res.status(500).send({ message: `Произошла ошибка ${err}` });
+})
 
 function setLike(req, res) {
   Card.findByIdAndUpdate(
