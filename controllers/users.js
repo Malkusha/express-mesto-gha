@@ -14,15 +14,10 @@ function getUserById(req,res) {
         return res.status(404).send({ message: `Пользователь не найден` });
       }
       res.status(200).send({ data: user })
-
     })
     .catch((err) => {
-      if (err.kind === 'ObjectID') {
-        return res.status(400).send({ message: `Пользователь не найден` });
-      }
-      else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
-      }
+
     })
 }
 
@@ -51,8 +46,7 @@ function updateUser(req, res) {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        console.log(err.name);
-        //return res.status(400).send({ message: `Переданы некорректные данные` });
+        return res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
