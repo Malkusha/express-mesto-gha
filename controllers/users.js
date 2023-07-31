@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 function getUsers(req, res) {
   User.find({})
@@ -10,6 +11,10 @@ function getUserById(req,res) {
   const { id } = req.params;
   User.findById(id)
     .then(user => {
+      const isValid = mongoose.Types.ObjectId.isValid(id);
+      if (!isValid) {
+        return res.status(400).send({ message: `Некорректный ID` });
+      } else
       if (!user) {
         return res.status(404).send({ message: `Пользователь не найден` });
       }
@@ -17,7 +22,6 @@ function getUserById(req,res) {
     })
     .catch((err) => {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
-
     })
 }
 
