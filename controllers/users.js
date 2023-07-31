@@ -9,7 +9,13 @@ function getUsers(req, res) {
 function getUserById(req,res) {
   const { id } = req.params;
   User.findById(id)
-    .then(user => res.status(200).send({ data: user }))
+    .then(user => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь не найден` });
+      } else {
+        res.status(200).send({ data: user })
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(404).send({ message: `Пользователь не найден` });
@@ -37,7 +43,13 @@ function createUser(req, res) {
 function updateUser(req, res) {
   const {name, about} = req.body;
   User.findByIdAndUpdate(req.user._id, {name, about})
-    .then(user => res.status(200).send({ data: user }))
+    .then(user => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь не найден` });
+      } else {
+        res.status(200).send({ data: user })
+      }
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
@@ -51,7 +63,13 @@ function updateUser(req, res) {
 function updateAvatar(req, res) {
   const {avatar} = req.body;
   User.findByIdAndUpdate(req.user._id, {avatar})
-    .then(user => res.status(200).send({ data: user }))
+    .then(user => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь не найден` });
+      } else {
+        res.status(200).send({ data: user })
+      }
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
