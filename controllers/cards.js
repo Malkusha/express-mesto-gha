@@ -26,9 +26,11 @@ function deleteCardById(req,res) {
     .then((card) => {
       if (!card) {
         res.send({ message: `Карточка не найдена` });
+      } else if (!req.user._id) {
+        res.send({ message: `Пользователь не найден` });
       }
      else {
-      res.status(201).send({data: card})
+      res.status(200).send({data: card})
     }})
     .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
 }
@@ -42,9 +44,11 @@ function setLike(req, res) {
   .then((card) => {
     if (!card) {
       res.send({ message: `Карточка не найдена` });
+    } else if (!req.user._id) {
+      res.send({ message: `Пользователь не найден` });
     }
    else {
-    res.status(201).send({data: card})
+    res.status(200).send({data: card})
   }})
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -65,6 +69,8 @@ function removeLike(req, res) {
   .then((card) => {
     if (!card) {
       res.send({ message: `Карточка не найдена` });
+    } else if (!req.user._id) {
+      res.send({ message: `Пользователь не найден` });
     }
    else {
     res.status(201).send({data: card})
@@ -77,8 +83,6 @@ function removeLike(req, res) {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
       }
     })
-
-
 }
 
 module.exports = {
