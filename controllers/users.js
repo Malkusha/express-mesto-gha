@@ -29,7 +29,7 @@ function getUserById(req,res) {
 function createUser(req, res) {
   const {name, about, avatar} = req.body;
   User.create({name, about, avatar})
-    .then(user => res.status(201).send({data: user}))
+    .then(user => res.status(201).send({data: user}, {new: true})
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
@@ -42,7 +42,7 @@ function createUser(req, res) {
 
 function updateUser(req, res) {
   const {name, about} = req.body;
-  User.findByIdAndUpdate(req.user._id, {name, about}, { new: true })
+  User.findByIdAndUpdate(req.user._id, {name, about}, {new: true})
     .then(user => {
       if (!user) {
         res.status(404).send({ message: `Пользователь не найден` });
@@ -62,7 +62,7 @@ function updateUser(req, res) {
 
 function updateAvatar(req, res) {
   const {avatar} = req.body;
-  User.findByIdAndUpdate(req.user._id, {avatar}, { new: true })
+  User.findByIdAndUpdate(req.user._id, {avatar}, {new: true })
     .then(user => {
       if (!user) {
         res.status(404).send({ message: `Пользователь не найден` });

@@ -9,7 +9,7 @@ function getCards(req, res) {
 function createCard(req, res) {
   const {name, link} = req.body;
   Card.create({name, link, owner: req.user._id})
-    .then(card => res.status(201).send({data: card}))
+    .then(card => res.status(201).send({data: card}, {new: true}))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
@@ -24,10 +24,8 @@ function deleteCardById(req,res) {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      if (!card) {
+      if (!cardId) {
         res.send({ message: `Карточка не найдена` });
-      } else if (!req.user._id) {
-        res.send({ message: `Пользователь не найден` });
       }
      else {
       res.status(200).send({data: card})
@@ -44,8 +42,6 @@ function setLike(req, res) {
   .then((card) => {
     if (!card) {
       res.send({ message: `Карточка не найдена` });
-    } else if (!req.user._id) {
-      res.send({ message: `Пользователь не найден` });
     }
    else {
     res.status(200).send({data: card})
@@ -69,8 +65,6 @@ function removeLike(req, res) {
   .then((card) => {
     if (!card) {
       res.send({ message: `Карточка не найдена` });
-    } else if (!req.user._id) {
-      res.send({ message: `Пользователь не найден` });
     }
    else {
     res.status(201).send({data: card})
