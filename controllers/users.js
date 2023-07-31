@@ -18,7 +18,7 @@ function getUserById(req,res) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: `Пользователь не найден` });
+        res.status(400).send({ message: `Пользователь не найден` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
@@ -29,7 +29,7 @@ function getUserById(req,res) {
 function createUser(req, res) {
   const {name, about, avatar} = req.body;
   User.create({name, about, avatar})
-    .then(user => res.status(201).send({data: user}, {new: true}))
+    .then(user => res.status(201).send({data: user}))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
