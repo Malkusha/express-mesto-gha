@@ -35,6 +35,7 @@ function deleteCardById(req,res) {
       }
      res.status(500).send({ message: `Произошла ошибка ${err}` });
 })
+}
 
 function setLike(req, res) {
   Card.findByIdAndUpdate(
