@@ -25,7 +25,7 @@ function createUser(req, res) {
   User.create({name, about, avatar})
     .then(user => res.status(201).send({data: user}))
     .catch((err) => {
-      if (err.code === 400) {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
@@ -39,7 +39,7 @@ function updateUser(req, res) {
   User.findByIdAndUpdate(req.user._id, {name, about})
     .then(user => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.code === 400) {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
@@ -53,7 +53,7 @@ function updateAvatar(req, res) {
   User.findByIdAndUpdate(req.user._id, {avatar})
     .then(user => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.code === 400) {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Переданы некорректные данные` });
       }
       else {
