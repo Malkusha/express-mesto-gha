@@ -27,9 +27,13 @@ function deleteCardById(req,res) {
       if (!card) {
         return res.send({ message: `Карточка не найдена` });
       }
-      res.status(200).send({data: card})
+      res.send({data: card})
     })
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: `Некорректный ID карточки` });
+      }
+    } res.status(500).send({ message: `Произошла ошибка ${err}` }));
 }
 
 function setLike(req, res) {
@@ -38,16 +42,15 @@ function setLike(req, res) {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-  .populate(['owner', 'likes'])
   .then((card) => {
     if (!card) {
       return res.send({ message: `Карточка не найдена` });
     }
-    res.status(200).send({data: card})
+    res.send({data: card})
   })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: `Карточка не найдена` });
+        return res.status(400).send({ message: `Некорректный ID карточки` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
@@ -61,16 +64,15 @@ function removeLike(req, res) {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-  .populate(['owner', 'likes'])
   .then((card) => {
     if (!card) {
       return res.send({ message: `Карточка не найдена` });
     }
-    res.status(201).send({data: card})
+    res.send({data: card})
   })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: `Карточка не найдена` });
+        return res.status(400).send({ message: `Некорректный ID карточки` });
       }
       else {
         res.status(500).send({ message: `Произошла ошибка ${err}` });
