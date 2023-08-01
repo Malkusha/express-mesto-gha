@@ -14,7 +14,6 @@ function createCard(req, res) {
       if (err.name === "ValidationError") {
         return res.status(400).send({ message: "Переданы некорректные данные" });
       }
-
       return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
@@ -22,14 +21,13 @@ function createCard(req, res) {
 function deleteCardById(req, res) {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .orFail(new Error('IdNotFound'))
     .then((card) => {
-      res.send({ data: card });
+      if (!card) {
+        return res.status(404).send({ message: "Карточка не найдена" });
+      }
+      return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.massage === 'IdNotFound') {
-        return res.status(404).send({ message: "Карточка не найдена" });
-      } else
       if (err.name === "CastError") {
         return res.status(400).send({ message: "Некорректный ID карточки" });
       }
