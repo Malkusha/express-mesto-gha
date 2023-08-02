@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-const
 
 const authRouter = require("./routes/auth");
 const auth = require("./middlewares/auth");

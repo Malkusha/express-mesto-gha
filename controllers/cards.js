@@ -25,7 +25,10 @@ function deleteCardById(req, res) {
       if (!card) {
         return res.status(404).send({ message: "Карточка не найдена" });
       }
-      return res.send({ data: card });
+      if (!card.owner._id === req.user._id) {
+        return res.send({message: "Нельзя удалить карточку, загруженную другим пользователем"});
+      }
+      return res.send({ message: "Карточка удалена" });
     })
     .catch((err) => {
       if (err.name === "CastError") {
