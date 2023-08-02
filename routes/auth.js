@@ -4,7 +4,7 @@ const {
   createUser
 } = require("../controllers/users");
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+authRouter.post('/signin', login);
+authRouter.post('/signup', createUser);
 
 module.exports = authRouter;
