@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
+const
 
 const authRouter = require("./routes/auth");
 const auth = require("./middlewares/auth");
@@ -18,15 +19,7 @@ mongoose.connect(DB_URL);
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-/*
-app.use((req, res, next) => {
-  req.user = {
-    _id: "64c6eacfc4c475ca6df4448f", // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
 
-  next();
-});
-*/
 app.use(authRouter);
 app.use(auth);
 app.use(router);
