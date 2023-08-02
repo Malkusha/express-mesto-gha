@@ -2,7 +2,7 @@ const authRouter = require("express").Router();
 const {
   login,
   createUser
-} = require("./controllers/users");
+} = require("../controllers/users");
 
 app.post('/signin', login);
 app.post('/signup', createUser);
