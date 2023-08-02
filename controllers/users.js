@@ -1,4 +1,29 @@
 const User = require("../models/user");
+const bcrypt = require('bcryptjs');
+
+function login(req, res) {
+  const {email, password} = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
+      })
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+}
+
+function getMe(req, res) {
+  User.findById(req.user._id)
+  .then((user) => res.status(200).send({ data: user }))
+  .catch((err) => {
+    if (err.name === "CastError") {
+      return res.status(400).send({ message: "Некорректный ID" });
+    }
+    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+  });
+}
 
 function getUsers(req, res) {
   User.find({})
@@ -25,13 +50,19 @@ function getUserById(req, res) {
 
 function createUser(req, res) {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  bcrypt.hash(req.body.password, 10)
+    .then(hash => User.create({
+      email: req.body.email,
+      password: hash,
+      name,
+      about,
+      avatar
+    }))
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res.status(400).send({ message: "Переданы некорректные данные" });
       }
-
       return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
@@ -72,9 +103,11 @@ function updateAvatar(req, res) {
 }
 
 module.exports = {
+  login,
+  getMe,
   getUsers,
   getUserById,
   createUser,
   updateUser,
-  updateAvatar,
+  updateAvatar
 };
