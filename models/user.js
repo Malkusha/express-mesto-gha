@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      minlengh: 8,
       select: false
     },
     name: {
@@ -56,7 +57,10 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       res.send({ message: 'Всё верно!' });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Некорректный формат данных" });
+      }
+      return res.status(401).send({ message: err.message });
     });
 };
 
