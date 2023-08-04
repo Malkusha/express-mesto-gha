@@ -33,7 +33,7 @@ function getUserById(req, res) {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден'); //return res.status(404).send({ message: "Пользователь не найден" });
+        throw new NotFoundError('Пользователь не найден');
       }
       return res.status(200).send({ data: user });
     })
@@ -92,7 +92,7 @@ function login(req, res) {
   }
   )
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      next(new Unauthorized('Проверьте корректность данных'));
     });
 };
 
@@ -101,15 +101,15 @@ function updateUser(req, res) {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: "Пользователь не найден" });
+        next(new NotFoundError('Пользователь не найден'))
       }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Переданы некорректные данные" });
+        next(new Unauthorized('Переданы некорректные данные'))  //return res.status(400).send({ message: "Переданы некорректные данные" });
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(new ServerError('Произошла ошибка'))//return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
 
@@ -118,16 +118,16 @@ function updateAvatar(req, res) {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: "Пользователь не найден" });
+        next(new NotFoundError('Пользователь не найден'))//return res.status(404).send({ message: "Пользователь не найден" });
       }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Переданы некорректные данные" });
+        next(new Unauthorized('Переданы некорректные данные'))//return res.status(400).send({ message: "Переданы некорректные данные" });
       }
 
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(new ServerError('Произошла ошибка'))//return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
 

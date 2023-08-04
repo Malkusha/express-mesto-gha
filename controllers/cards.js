@@ -1,9 +1,15 @@
+const {
+  ServerError,
+  NotFoundError,
+  AccessError,
+  BadRequest
+ } = require("../errors");
 const Card = require("../models/card");
 
 function getCards(req, res) {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
+    .catch(next(new ServerError('Произошла ошибка')));
 }
 
 function createCard(req, res) {
@@ -12,9 +18,9 @@ function createCard(req, res) {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Переданы некорректные данные" });
+        next(new Unauthorized('Переданы некорректные данные'))  //return res.status(400).send({ message: "Переданы некорректные данные" });
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(new ServerError('Произошла ошибка'));
     });
 }
 
@@ -23,18 +29,18 @@ function deleteCardById(req, res) {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: "Карточка не найдена" });
+        next(new NotFoundError('Карточка не найдена'))//return res.status(404).send({ message: "Пользователь не найден" });
       }
-      if (!card.owner._id === req.user._id) {
-        return res.send({message: "Нельзя удалить карточку, загруженную другим пользователем"});
+      if (!card.owner._id.toString() === req.user._id.toString()) {
+        next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))//return res.send({message: "Нельзя удалить карточку, загруженную другим пользователем"});
       }
       return res.send({ message: "Карточка удалена" });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Некорректный ID карточки" });
+        next(new BadRequest('Некорректный ID карточки'))//return res.status(400).send({ message: "Некорректный ID карточки" });
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(new ServerError('Произошла ошибка'));//return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
 
@@ -46,15 +52,15 @@ function setLike(req, res) {
   )
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: "Карточка не найдена" });
+        next(new NotFoundError('Карточка не найдена'))//return res.status(404).send({ message: "Пользователь не найден" });
       }
       return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Некорректный ID карточки" });
+        next(new BadRequest('Некорректный ID карточки'))//return res.status(400).send({ message: "Некорректный ID карточки" });
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(new ServerError('Произошла ошибка'));//return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
 
@@ -66,15 +72,15 @@ function removeLike(req, res) {
   )
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: "Карточка не найдена" });
+        next(new NotFoundError('Карточка не найдена'))//return res.status(404).send({ message: "Пользователь не найден" });
       }
       return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Некорректный ID карточки" });
+        next(new BadRequest('Некорректный ID карточки'))//return res.status(400).send({ message: "Некорректный ID карточки" });
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(new ServerError('Произошла ошибка'));//return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });
 }
 
