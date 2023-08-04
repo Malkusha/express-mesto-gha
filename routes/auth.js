@@ -22,7 +22,7 @@ authRouter.post('/signup',
         name: Joi.string().min(2).max(30),
         age: Joi.number().integer().required().min(18),
         about: Joi.string().min(2).max(30),
-        avatar: Joi.string().pattern(new RegExp(/^(http|https):\/\/)([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$ /))
+        avatar: Joi.string().pattern(new RegExp(/^(http|https):\/\/([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/))
       })
     }),
   createUser);

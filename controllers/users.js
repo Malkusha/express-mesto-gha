@@ -1,7 +1,12 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 
-const someError = require("../errors");
+const {
+  NotFoundError,
+  BadRequest,
+  Unauthorized,
+  Conflict
+} = require("../errors");
 
 function login(req, res) {
   const {email, password} = req.body;
@@ -12,7 +17,7 @@ function login(req, res) {
       })
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      next(err);
     });
 }
 
@@ -21,16 +26,16 @@ function getMe(req, res) {
   .then((user) => res.status(200).send({ data: user }))
   .catch((err) => {
     if (err.name === "CastError") {
-      return res.status(400).send({ message: "Некорректный ID" });
+      next(new BadRequest('Некорректный ID'));
     }
-    return res.status(500).send({ message: `Произошла ошибка ${err}` });
+    next(err);
   });
 }
 
 function getUsers(req, res) {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
+    .catch(next);
 }
 
 function getUserById(req, res) {
@@ -38,15 +43,15 @@ function getUserById(req, res) {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: "Пользователь не найден" });
+        throw new NotFoundError('Пользователь не найден'); //return res.status(404).send({ message: "Пользователь не найден" });
       }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Некорректный ID" });
+        next(new BadRequest('Некорректный ID'));
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(err);
     });
 }
 
@@ -60,15 +65,18 @@ function createUser(req, res) {
       about,
       avatar
     }))
-    .then((user) => res.status(201).send({
+    .then(() => res.status(201).send({
       email,
       name,
       about,
       avatar
     }))
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
+      }
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Переданы некорректные данные" });
+        next(new NotFoundError('Пользователь не найден'));
       }
       return res.status(500).send({ message: `Произошла ошибка ${err}` });
     });

@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-
+const {
+  Unauthorized,
+  BadRequest
+} = require("../errors/unauthorized");
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -46,21 +49,21 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return res.send({ message: "Почта или пароль указаны неверно"});
+        return Promise.reject(new Unauthorized('Неправильные почта или пароль'));
       }
       return bcrypt.compare(password, user.password);
     })
     .then((matched) => {
       if (!matched) {
-        return res.send({ message: "Почта или пароль указаны неверно"});
+        return Promise.reject(new Unauthorized('Неправильные почта или пароль'));
       }
       res.send({ message: 'Всё верно!' });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Некорректный формат данных" });
+        return Promise.reject(new BadRequest('Некорректный формат данных' ));
       }
-      return res.status(401).send({ message: err.message });
+      return Promise.reject(new Unauthorized('Неправильные почта или пароль'));
     });
 };
 
