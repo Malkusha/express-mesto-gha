@@ -49,11 +49,11 @@ function createUser(req, res) {
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then(hash => User.create({
-      email,
+      email: req.body.email,
       password: hash,
-      name,
-      about,
-      avatar
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar
     }))
     .then((user) => res.status(201).send({
       _id: user._id,
@@ -63,9 +63,9 @@ function createUser(req, res) {
       avatar: user.avatar,
     }))
     .catch((err) => {
-    /*  if (err.code === 11000) {
+      if (err.code === 11000) {
         next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
-      } else */
+      } else
       if (err.name === "ValidationError") {
         next(new NotFoundError('Пользователь не найден'));
       }
