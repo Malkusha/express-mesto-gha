@@ -46,20 +46,16 @@ function getUserById(req, res) {
 }
 
 function createUser(req, res) {
+  const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then(hash => User.create({
-      email: req.body.email,
+      email,
       password: hash,
-      name: req.body.name,
-      about: req.body.about,
-      avatar: req.body.avatar
+      name,
+      about,
+      avatar
     }))
-    .then((user) => res.status(201).send({
-      email: user.email,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-    }))
+    .then((user) => res.status(201).send({data: user}))
     .catch((err) => {
       if (err.code === 11000) {
         next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
