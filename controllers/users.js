@@ -46,7 +46,6 @@ function getUserById(req, res) {
 }
 
 function createUser(req, res) {
-  const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then(hash => User.create({
       email: req.body.email,
@@ -56,7 +55,6 @@ function createUser(req, res) {
       avatar: req.body.avatar
     }))
     .then((user) => res.status(201).send({
-      _id: user._id,
       email: user.email,
       name: user.name,
       about: user.about,
