@@ -10,16 +10,27 @@ const {
 
 function login(req, res) {
   const {email, password} = req.body;
-  User.findOne(email, password)
+  User.findOne({ email })
     .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Что-то не так с почтой или паролем'));
+      }
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+  // перейдём в .catch, отклонив промис
+        Promise.reject(new Error('Что-то не так с почтой или паролем'));
+}
       res.send({
         token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
       })
-    })
+  }
+  )
     .catch((err) => {
-      next(err);
+      res.status(401).send({ message: err.message });
     });
-}
+};
 
 function getMe(req, res) {
   User.findById(req.user._id)
@@ -65,12 +76,12 @@ function createUser(req, res) {
       about,
       avatar
     }))
-    .then(() => res.status(201).json({
-      email,
-      name,
-      about,
-      avatar,
-      _id
+    .then((user) => res.status(201).send({
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
     }))
     .catch((err) => {
       if (err.code === 11000) {
