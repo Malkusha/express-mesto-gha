@@ -56,21 +56,28 @@ function getUserById(req, res) {
 }
 
 function createUser(req, res) {
-  const { name, about, avatar } = req.body;
-  bcrypt.hash(req.body.password, 10)
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10)
     .then(hash => User.create({
-      email: req.body.email,
+      email,
       password: hash,
       name,
       about,
       avatar
     }))
-    .then(() => res.status(201).send({
+    .then(() => console.log({
       email,
       name,
       about,
-      avatar
-    }))
+      avatar,
+      _id
+    })/* res.status(201).send({
+      email,
+      name,
+      about,
+      avatar,
+      _id
+    })*/)
     .catch((err) => {
       if (err.code === 11000) {
         next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
@@ -78,7 +85,7 @@ function createUser(req, res) {
       if (err.name === "ValidationError") {
         next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      next(err);
     });
 }
 
