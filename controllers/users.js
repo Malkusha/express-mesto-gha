@@ -65,7 +65,7 @@ function createUser(req, res) {
     .catch((err) => {
       if (err.code === 11000) {
         next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
-      }
+      } else
       if (err.name === "ValidationError") {
         next(new NotFoundError('Пользователь не найден'));
       }
