@@ -5,32 +5,11 @@ const {
   NotFoundError,
   BadRequest,
   Unauthorized,
-  Conflict
+  Conflict,
+  ServerError
 } = require("../errors");
 
-function login(req, res) {
-  const {email, password} = req.body;
-  User.findOne({ email })
-    .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Что-то не так с почтой или паролем'));
-      }
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) {
-  // перейдём в .catch, отклонив промис
-        Promise.reject(new Error('Что-то не так с почтой или паролем'));
-}
-      res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
-      })
-  }
-  )
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
-};
+
 
 function getMe(req, res) {
   User.findById(req.user._id)
@@ -39,14 +18,14 @@ function getMe(req, res) {
     if (err.name === "CastError") {
       next(new BadRequest('Некорректный ID'));
     }
-    next(err);
+    next();
   });
 }
 
 function getUsers(req, res) {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch(next);
+    .catch(next(new ServerError('Авторизуйтесь')));
 }
 
 function getUserById(req, res) {
@@ -62,7 +41,7 @@ function getUserById(req, res) {
       if (err.name === "CastError") {
         next(new BadRequest('Некорректный ID'));
       }
-      next(err);
+      next(new ServerError('Авторизуйтесь'));
     });
 }
 
@@ -90,9 +69,32 @@ function createUser(req, res) {
       if (err.name === "ValidationError") {
         next(new NotFoundError('Пользователь не найден'));
       }
-      next(err);
+      next(new ServerError('Авторизуйтесь'));
     });
 }
+
+function login(req, res) {
+  const {email, password} = req.body;
+  User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Unauthorized('Проверьте корректность данных'));
+      }
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        Promise.reject(new Unauthorized('Проверьте корректность данных'));
+  }
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
+      })
+  }
+  )
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
 
 function updateUser(req, res) {
   const { name, about } = req.body;
