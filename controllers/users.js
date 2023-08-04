@@ -1,9 +1,11 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 
+const someError = require("../errors");
+
 function login(req, res) {
   const {email, password} = req.body;
-  return User.findUserByCredentials(email, password)
+  User.findOne(email, password)
     .then((user) => {
       res.send({
         token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
@@ -59,10 +61,10 @@ function createUser(req, res) {
       avatar
     }))
     .then((user) => res.status(201).send({
-      email: user.email,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar
+      email,
+      name,
+      about,
+      avatar
     }))
     .catch((err) => {
       if (err.name === "ValidationError") {

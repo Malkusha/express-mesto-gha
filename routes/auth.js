@@ -6,8 +6,6 @@ const {
   createUser
 } = require("../controllers/users");
 
-const linkPattern = /^(http|https):\/\/)([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-
 authRouter.post('/signin',
   celebrate({
     body: Joi.object().keys({
@@ -24,7 +22,7 @@ authRouter.post('/signup',
         name: Joi.string().min(2).max(30),
         age: Joi.number().integer().required().min(18),
         about: Joi.string().min(2).max(30),
-        avatar: Joi.string().pattern(new RegExp(linkPattern))
+        avatar: Joi.string().pattern(new RegExp(/^(http|https):\/\/)([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$ /))
       })
     }),
   createUser);
