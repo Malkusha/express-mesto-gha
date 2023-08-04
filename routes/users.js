@@ -1,4 +1,5 @@
 const usersRouter = require("express").Router();
+const {Joi, celebrate} = require("celebrate");
 
 const {
   getMe,
