@@ -1,13 +1,11 @@
 const authRouter = require("express").Router();
-const {Joi, celebrate, errors} = require("celebrate");
+const {Joi, celebrate} = require("celebrate");
 
 
 const {
   login,
   createUser
 } = require("../controllers/users");
-
-authRouter.use(errors());
 
 authRouter.post('/signin',
   celebrate({

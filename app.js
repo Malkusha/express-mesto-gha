@@ -6,8 +6,6 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 
 const {errors} = require("celebrate");
-const authRouter = require("./routes/auth");
-const auth = require("./middlewares/auth");
 const router = require("./routes/index");
 
 const { PORT = 3000, DB_URL = "mongodb://127.0.0.1:27017/mestodb" } = process.env;
@@ -23,8 +21,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(errors());
-app.use(authRouter);
-app.use(auth);
 app.use(router);
 
 
