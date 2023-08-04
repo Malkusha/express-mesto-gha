@@ -7,7 +7,7 @@ const {
   createUser
 } = require("../controllers/users");
 
-app.use(errors());
+authRouter.use(errors());
 
 authRouter.post('/signin',
   celebrate({
