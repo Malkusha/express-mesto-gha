@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");
 
 const {
@@ -91,11 +92,20 @@ function updateAvatar(req, res) {
 function login(req, res) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
-    .then((user) => {
-      res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
-      });
-    })
+  .then((user) => {
+    const token = jwt.sign(
+      { _id: user._id },
+      'some-secret-key',
+      { expiresIn: '7d' },
+    );
+    console.log({token});
+    res.send({ token });
+  })
+   // .then((user) => {
+     // res.send({
+       // token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+     // });
+    //})
     .catch((err) => {
       res.status(401).send({ message: err.message });
     });
