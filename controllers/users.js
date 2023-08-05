@@ -55,13 +55,13 @@ function createUser(req, res) {
       about,
       avatar
     }))
-    .then((user) => res.status(201).send({
-      //_id: user._id,
-      email: user.email,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-    }))
+    .then(() => res.status(201).send({data: {
+      _id,
+      email,
+      name,
+      about,
+      avatar,
+    }}))
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(new NotFoundError('Пользователь не найден'));
