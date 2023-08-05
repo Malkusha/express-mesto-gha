@@ -44,10 +44,11 @@ function createUser(req, res) {
       name, about, avatar, email
     }))
     .catch((err) => {
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с такой почтой уже существует'))
+      }
       if (err.name === "ValidationError") {
         return next(new BadRequestError('Переданы некорректные данные'));
-      } else if (err.code === 11000) {
-        return next(new ConflictError('Пользователь с такой почтой уже существует'))
       }
       return next(new ServerError(`Произошла ошибка: ${err}`))
     });
@@ -125,7 +126,9 @@ function login(req, res) {
 */
 function getCurrentUser(req, res) {
   User.findById(req.user._id)
-  .then((user) => res.status(200).send({ data: user }))
+  .then((user) => res.status(200).send({
+    name, about, avatar, email
+  }))
   .catch((err) => {
     if (err.name === "CastError") {
       return next(new BadRequestError('Некорректный ID'));
