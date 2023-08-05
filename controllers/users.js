@@ -91,13 +91,13 @@ function login(req, res) {
   User.findOne({email}).select(+password)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        return Promise.reject(new NotFoundError('Пользователь не найден'));
       }
       return bcrypt.compare(password, user.password);
     })
     .then((matched) => {
       if (!matched) {
-        return next(new BadRequestError('Переданы некорректные данные'));
+        return Promise.reject(new BadRequestError('Переданы некорректные данные'));
       }
       res.send({
         token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
