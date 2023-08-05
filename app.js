@@ -4,16 +4,16 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const {Joi, celebrate, errors} = require("celebrate");
+const cookieParser = require("cookie-parser");
 
 const router = require("./routes/index");
 const {login, createUser} = require("./controllers/users");
-const auth = require("./middlewares/auth");
 
 const { PORT = 3000, DB_URL = "mongodb://127.0.0.1:27017/mestodb" } = process.env;
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 mongoose.connect(DB_URL, { autoIndex: true });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -39,7 +39,7 @@ app.post('/signin',
     })
   }),
   login);
-app.use(auth);
+//app.use(auth);
 app.use(router);
 app.use(errors());
 

@@ -9,10 +9,10 @@ const {
   updateAvatar,
 } = require("../controllers/users");
 
-
+usersRouter.get("/me", getMe);
 usersRouter.get("/", getUsers);
 
-usersRouter.get("/me", getMe);
+
 usersRouter.patch("/me",
   celebrate({
     body: Joi.object().keys({
