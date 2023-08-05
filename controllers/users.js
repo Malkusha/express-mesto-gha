@@ -55,7 +55,13 @@ function createUser(req, res) {
       about,
       avatar
     }))
-    .then((user) => res.status(201).send({data: user}))
+    .then((user) => res.status(201).send({
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));

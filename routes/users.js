@@ -11,7 +11,7 @@ const {
 
 
 usersRouter.get("/", getUsers);
-usersRouter.get("/:userId", getUserById);
+
 usersRouter.get("/me", getMe);
 usersRouter.patch("/me",
   celebrate({
@@ -28,5 +28,6 @@ usersRouter.patch("/me/avatar",
     })
   })
   , updateAvatar);
+usersRouter.get("/:userId", getUserById);
 
 module.exports = usersRouter;
