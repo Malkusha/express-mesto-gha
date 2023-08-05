@@ -5,7 +5,8 @@ const {
   NotFoundError,
   BadRequestError,
   ConflictError,
-  ServerError
+  ServerError,
+  UnauthorizedError
 } = require("../errors/index");
 
 function getUsers(req, res) {
@@ -87,6 +88,20 @@ function updateAvatar(req, res) {
 }
 
 function login(req, res) {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
+/*
+{
   const {email, password} = req.body;
   User.findOne({email}).select(+password)
     .then((user) => {
@@ -97,7 +112,7 @@ function login(req, res) {
     })
     .then((matched) => {
       if (!matched) {
-        return Promise.reject(new BadRequestError('Переданы некорректные данные'));
+        return Promise.reject(new NotFoundError('Пользователь не найден'));
       }
       res.send({
         token: jwt.sign({ _id: user._id }, 'super-strong-secret', {expiresIn: '7d'})
@@ -107,7 +122,7 @@ function login(req, res) {
       return next(new ServerError(`Произошла ошибка: ${err}`))
     })
 }
-
+*/
 function getCurrentUser(req, res) {
   User.findById(req.user._id)
   .then((user) => res.status(200).send({ data: user }))
