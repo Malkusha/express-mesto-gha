@@ -107,7 +107,7 @@ function login(req, res) {
 function getCurrentUser(req, res) {
   User.findById(req.user._id)
   .then((user) => res.status(200).send({
-    name, about, avatar, email
+    data: user
   }))
   .catch((err) => {
     if (err.name === "CastError") {
