@@ -104,17 +104,21 @@ function login(req, res) {
       res.status(401).send({ message: err.message });
     });
 };
+
 function getCurrentUser(req, res) {
   User.findById(req.user._id)
-  .then((user) => res.status(200).send({
-    data: user
-  }))
-  .catch((err) => {
-    if (err.name === "CastError") {
-      return next(new BadRequestError('Некорректный ID'));
-    }
-    return next(new ServerError(`Произошла ошибка: ${err}`))
-  });
+    .then((user) => {
+      if (!user) {
+        return next(new NotFoundError('Пользователь не найден'));
+      }
+      return res.status(200).send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return next(new BadRequestError('Некорректный ID'));
+      }
+      return next(new ServerError(`Произошла ошибка: ${err}`))
+    });
 }
 
 module.exports = {
