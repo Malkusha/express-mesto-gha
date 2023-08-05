@@ -31,7 +31,7 @@ function getUserById(req, res) {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 
