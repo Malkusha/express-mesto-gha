@@ -25,13 +25,17 @@ function getUserById(req, res) {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(200).send({ data: user });
+      return res.status(200).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return next(new BadRequestError('Некорректный ID'));
+        throw new BadRequestError('Некорректный ID');
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 
@@ -46,7 +50,7 @@ function createUser(req, res) {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new ConflictError('Пользователь с такой почтой уже существует'))
+        throw new ConflictError('Пользователь с такой почтой уже существует')
       }
       if (err.name === "ValidationError") {
         return next(new BadRequestError('Переданы некорректные данные'));
@@ -106,12 +110,17 @@ function login(req, res) {
 };
 
 function getCurrentUser(req, res) {
-  User.findById(req.user._id)
+  const id = req.user._id;
+  User.findById(id)
     .then((user) => {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(200).send({ data: user });
+      return res.status(200).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === "CastError") {
