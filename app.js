@@ -39,7 +39,6 @@ app.post('/signin',
     })
   }),
   login);
-//app.use(auth);
 app.use(router);
 app.use(errors());
 

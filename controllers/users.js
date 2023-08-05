@@ -56,24 +56,37 @@ function createUser(req, res) {
       avatar
     }))
     .then((user) => res.status(201).send({
-      _id: user._id,
+      //_id: user._id,
       email: user.email,
       name: user.name,
       about: user.about,
       avatar: user.avatar,
     }))
     .catch((err) => {
-      if (err.code === 11000) {
-        next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
-      } else
       if (err.name === "ValidationError") {
         next(new NotFoundError('Пользователь не найден'));
+      }
+      else if (err.code === 11000) {
+        next(new Conflict('Пользователь с такой почтой уже зарегистрирован'));
       }
       next(new ServerError('Авторизуйтесь'));
     });
 }
 
 function login(req, res) {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+/*
+{
   const {email, password} = req.body;
   User.findOne({ email }).select('+password')
     .then((user) => {
@@ -95,7 +108,7 @@ function login(req, res) {
       next(new Unauthorized('Проверьте корректность данных'));
     });
 };
-
+*/
 function updateUser(req, res) {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
