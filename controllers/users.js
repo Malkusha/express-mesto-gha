@@ -40,11 +40,7 @@ function createUser(req, res) {
       User.create({ name, about, avatar, email, password: hash })
     })
     .then((user) => res.status(201).send({
-      _id: user._id,
-      email: user.email,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar
+      name, about, avatar, email
     }))
     .catch((err) => {
       if (err.name === "ValidationError") {
