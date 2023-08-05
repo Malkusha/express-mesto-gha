@@ -6,7 +6,6 @@ const helmet = require("helmet");
 const {Joi, celebrate, errors} = require("celebrate");
 
 const {login, createUser} = require("./controllers/users");
-const auth = require("./middlewares/auth");
 const router = require("./routes/index");
 
 const { PORT = 3000, DB_URL = "mongodb://127.0.0.1:27017/mestodb" } = process.env;
@@ -37,7 +36,6 @@ celebrate({
   })
 }), createUser);
 
-app.use(auth);
 app.use(router);
 app.use(errors());
 
