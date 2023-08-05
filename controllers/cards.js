@@ -1,15 +1,18 @@
-const {
-  ServerError,
-  NotFoundError,
-  AccessError,
-  BadRequest
- } = require("../errors");
 const Card = require("../models/card");
+const {
+  NotFoundError,
+  BadRequestError,
+  ConflictError,
+  ServerError,
+  AccessError
+} = require("../errors/index");
 
 function getCards(req, res) {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(next(new ServerError('Произошла ошибка')));
+    .catch((err) => {
+      return next(new ServerError(`Произошла ошибка: ${err}`))
+    })
 }
 
 function createCard(req, res) {
@@ -18,9 +21,9 @@ function createCard(req, res) {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        next(new Unauthorized('Переданы некорректные данные'))  //return res.status(400).send({ message: "Переданы некорректные данные" });
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(new ServerError('Произошла ошибка'));
+      return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 
@@ -29,18 +32,15 @@ function deleteCardById(req, res) {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка не найдена'))//return res.status(404).send({ message: "Пользователь не найден" });
+        return next(new NotFoundError('Карточка не найдена'));
       }
-      if (!card.owner._id.toString() === req.user._id.toString()) {
-        next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))//return res.send({message: "Нельзя удалить карточку, загруженную другим пользователем"});
-      }
-      return res.send({ message: "Карточка удалена" });
+      return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new BadRequest('Некорректный ID карточки'))//return res.status(400).send({ message: "Некорректный ID карточки" });
+        return next(new BadRequestError('Некорректный ID карточки'));
       }
-      next(new ServerError('Произошла ошибка'));//return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 
@@ -52,15 +52,17 @@ function setLike(req, res) {
   )
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка не найдена'))//return res.status(404).send({ message: "Пользователь не найден" });
+        return next(new NotFoundError('Карточка не найдена'));
+      } else if (!card.owner._id.toString() === req.user._id.toString()) {
+        return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))
       }
-      return res.send({ data: card });
+      return res.send({ message: "Карточка удалена" });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new BadRequest('Некорректный ID карточки'))//return res.status(400).send({ message: "Некорректный ID карточки" });
+        return next(new BadRequestError('Некорректный ID карточки'));
       }
-      next(new ServerError('Произошла ошибка'));//return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 
@@ -72,15 +74,15 @@ function removeLike(req, res) {
   )
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка не найдена'))//return res.status(404).send({ message: "Пользователь не найден" });
+        return next(new NotFoundError('Карточка не найдена'));
       }
       return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new BadRequest('Некорректный ID карточки'))//return res.status(400).send({ message: "Некорректный ID карточки" });
+        return next(new BadRequestError('Некорректный ID карточки'));
       }
-      next(new ServerError('Произошла ошибка'));//return res.status(500).send({ message: `Произошла ошибка ${err}` });
+      return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 

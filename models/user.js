@@ -15,29 +15,28 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlengh: 8,
-      select: false,
+      minlength: 8,
+      select: false
     },
     name: {
       type: String,
-      default: "Жак-Ив Кусто",
       minlength: [2, "Минимальная длина поля \"name\" - 2"],
       maxlength: [30, "Максимальная длина поля \"name\" - 30"],
+      default: "Жак-Ив Кусто"
     },
     about: {
       type: String,
-      default: "Исследователь",
       minlength: [2, "Минимальная длина поля \"name\" - 2"],
       maxlength: [30, "Максимальная длина поля \"name\" - 30"],
+      default: "Исследователь"
     },
     avatar: {
       type: String,
-      default: "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
       validate: {
         validator: (v) => validator.isURL(v),
-         // return /^(http|https):\/\/([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(v);
         message: "Некорректный URL",
       },
+      default: "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png"
     },
   },
   { versionKey: false },
