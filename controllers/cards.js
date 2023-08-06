@@ -55,9 +55,9 @@ function setLike(req, res, next) {
   )
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Карточка не найдена'));
+        throw new NotFoundError('Карточка не найдена');
       }
-      return res.send({ message: "Карточка удалена" });
+      res.send({ message: "Карточка удалена" });
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -75,7 +75,7 @@ function removeLike(req, res, next) {
   )
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Карточка не найдена'));
+        throw new NotFoundError('Карточка не найдена');
       }
       return res.send({ data: card });
     })

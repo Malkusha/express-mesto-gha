@@ -25,11 +25,7 @@ function getUserById(req, res, next) {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(200).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-      });
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === "CastError") {
@@ -115,7 +111,7 @@ function getCurrentUser(req, res, next) {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        throw new NotFoundError('Пользователь не найден');
       }
       return res.status(200).send({
         name: user.name,
