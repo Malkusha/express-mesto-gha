@@ -11,7 +11,12 @@ const {
 
 usersRouter.get("/", getUsers);
 usersRouter.get("/me", getCurrentUser);
-usersRouter.get("/:userId", getUserById);
+usersRouter.get("/:userId",
+celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().hex().length(24),
+  }),
+}), getUserById);
 usersRouter.patch("/me",
   celebrate({
     body: Joi.object().keys({
@@ -22,7 +27,7 @@ usersRouter.patch("/me",
 usersRouter.patch("/me/avatar",
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string().pattern(new RegExp(/^(http|https):\/\/([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/))
+    avatar: Joi.string().pattern(new RegExp(/^(http|https):\/\/([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/))
     })
   })
   , updateAvatar);

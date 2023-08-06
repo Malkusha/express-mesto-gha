@@ -32,7 +32,7 @@ function deleteCardById(req, res, next) {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Карточка не найдена'));
+        throw new NotFoundError('Карточка не найдена');
       }
       if (!card.owner._id.toString() === req.user._id.toString()) {
         return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))
@@ -55,7 +55,7 @@ function setLike(req, res, next) {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Карточка не найдена');
+        return next(new NotFoundError('Карточка не найдена'));
       }
       res.send({ message: "Карточка удалена" });
     })
@@ -75,7 +75,7 @@ function removeLike(req, res, next) {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Карточка не найдена');
+        return next(new NotFoundError('Карточка не найдена'));
       }
       return res.send({ data: card });
     })
