@@ -13,8 +13,8 @@ cardsRouter.get("/", getCards);
 cardsRouter.post("/",
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().required.min(2).max(30),
-      link: Joi.string().required.Joi.string().pattern(new RegExp(/^(http|https):\/\/([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/))
+      name: Joi.string().required().min(2).max(30),
+      link: Joi.string().pattern(new RegExp(/^(http|https):\/\/([\w\.]+)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/))
     })
   }), createCard);
 

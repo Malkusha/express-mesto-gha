@@ -49,7 +49,8 @@ function createUser(req, res, next) {
       name, about, avatar, email
     }))
     .catch((err) => {
-      if (err.code === 11000) {
+      if (err.code === 11000 || MongoServerError.message.includes('E11000 duplicate key error')) {
+        console.log(err.code);
         return next(new ConflictError('Пользователь с такой почтой уже существует'));
       }
       if (err.name === "ValidationError") {

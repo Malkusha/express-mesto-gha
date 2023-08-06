@@ -13,7 +13,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(DB_URL, {autoIndex: true});
+mongoose.connect(DB_URL);
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());

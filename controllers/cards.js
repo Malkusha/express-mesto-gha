@@ -34,6 +34,9 @@ function deleteCardById(req, res, next) {
       if (!card) {
         return next(new NotFoundError('Карточка не найдена'));
       }
+      if (!card.owner._id.toString() === req.user._id.toString()) {
+        return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))
+      }
       return res.send({ data: card });
     })
     .catch((err) => {
@@ -53,8 +56,6 @@ function setLike(req, res, next) {
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('Карточка не найдена'));
-      } else if (!card.owner._id.toString() === req.user._id.toString()) {
-        return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))
       }
       return res.send({ message: "Карточка удалена" });
     })
