@@ -10,7 +10,7 @@ const {
   UnauthorizedError
 } = require("../errors/index");
 
-function getUsers(req, res) {
+function getUsers(req, res, next) {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
     .catch((err) => {
@@ -18,7 +18,7 @@ function getUsers(req, res) {
     });
 }
 
-function getUserById(req, res) {
+function getUserById(req, res, next) {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
@@ -33,13 +33,13 @@ function getUserById(req, res) {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        throw new BadRequestError('Некорректный ID');
+        return next(new BadRequestError('Некорректный ID'));
       }
-      next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
 
-function createUser(req, res) {
+function createUser(req, res, next) {
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
@@ -50,7 +50,7 @@ function createUser(req, res) {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictError('Пользователь с такой почтой уже существует')
+        return next(new ConflictError('Пользователь с такой почтой уже существует'));
       }
       if (err.name === "ValidationError") {
         return next(new BadRequestError('Переданы некорректные данные'));
@@ -59,7 +59,7 @@ function createUser(req, res) {
     });
 }
 
-function updateUser(req, res) {
+function updateUser(req, res, next) {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
@@ -76,7 +76,7 @@ function updateUser(req, res) {
     });
 }
 
-function updateAvatar(req, res) {
+function updateAvatar(req, res, next) {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
@@ -93,7 +93,7 @@ function updateAvatar(req, res) {
     });
 }
 
-function login(req, res) {
+function login(req, res, next) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
   .then((user) => {
@@ -105,11 +105,11 @@ function login(req, res) {
     res.send({ token });
   })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      return next(new UnauthorizedError('Ошибка'));
     });
 };
 
-function getCurrentUser(req, res) {
+function getCurrentUser(req, res, next) {
   const id = req.user._id;
   User.findById(id)
     .then((user) => {
