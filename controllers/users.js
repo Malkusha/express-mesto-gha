@@ -91,32 +91,9 @@ function updateAvatar(req, res, next) {
 
 function login(req, res, next) {
   const { email, password } = req.body;
-  User.findOne({ email })
-  .then((user) => {
-    if (!user) {
-      return Promise.reject(new Error('Неправильные почта или пароль'));
-    }
-    return bcrypt.compare(password, user.password);
-  })
-  .then((matched) => {
-    if (!matched) {
-// перейдём в .catch, отклонив промис
-      Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
-    }
-    const token = jwt.sign(
-      { _id: user._id },
-      'some-secret-key',
-      { expiresIn: '7d' },
-    );
-    res.send(  {token})
-})
-  .catch((err) => {
-    res.status(401).send({ message: err.message });
-  });
-};
-  /*
   return User.findUserByCredentials(email, password)
   .then((user) => {
+    console.log(user);
     const token = jwt.sign(
       { _id: user._id },
       'some-secret-key',
@@ -128,7 +105,7 @@ function login(req, res, next) {
       return next(new UnauthorizedError('Ошибка'));
     });
 };
-*/
+
 function getCurrentUser(req, res, next) {
   const id = req.user._id;
   User.findById(id)
