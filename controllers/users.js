@@ -123,6 +123,7 @@ function getCurrentUser(req, res, next) {
         throw new NotFoundError('Пользователь не найден');
       }
       return res.status(200).send({
+        email: user.email,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
