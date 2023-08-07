@@ -51,12 +51,11 @@ function createUser(req, res, next) {
     }))
     .catch((err) => {
       if (err.code === 11000 || MongoServerError.message.includes('E11000 duplicate key error')) {
-        throw new ConflictError('Пользователь с такой почтой уже существует');
+        return next(new ConflictError('Пользователь с такой почтой уже существует'));
       }
       if (err.name === "ValidationError") {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next();
       return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
