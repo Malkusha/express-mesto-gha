@@ -23,7 +23,7 @@ function getUserById(req, res, next) {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        return next(new NotFoundError('Пользователь не найден'));
       }
       return res.status(200).send(user);
     })
@@ -41,12 +41,11 @@ function createUser(req, res, next) {
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
     })
-    .then((user) => res.status(201).send({
+    .then((user) =>  res.status(201).send({
       name, about, avatar, email
     }))
     .catch((err) => {
       if (err.code === 11000 || MongoServerError.message.includes('E11000 duplicate key error')) {
-        console.log(err.code);
         return next(new ConflictError('Пользователь с такой почтой уже существует'));
       }
       if (err.name === "ValidationError") {
@@ -92,6 +91,30 @@ function updateAvatar(req, res, next) {
 
 function login(req, res, next) {
   const { email, password } = req.body;
+  User.findOne({ email })
+  .then((user) => {
+    if (!user) {
+      return Promise.reject(new Error('Неправильные почта или пароль'));
+    }
+    return bcrypt.compare(password, user.password);
+  })
+  .then((matched) => {
+    if (!matched) {
+// перейдём в .catch, отклонив промис
+      Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
+    }
+    const token = jwt.sign(
+      { _id: user._id },
+      'some-secret-key',
+      { expiresIn: '7d' },
+    );
+    res.send(  {token})
+})
+  .catch((err) => {
+    res.status(401).send({ message: err.message });
+  });
+};
+  /*
   return User.findUserByCredentials(email, password)
   .then((user) => {
     const token = jwt.sign(
@@ -105,7 +128,7 @@ function login(req, res, next) {
       return next(new UnauthorizedError('Ошибка'));
     });
 };
-
+*/
 function getCurrentUser(req, res, next) {
   const id = req.user._id;
   User.findById(id)
