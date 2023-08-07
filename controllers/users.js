@@ -93,7 +93,7 @@ function login(req, res, next) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
   .then((user) => {
-    console.log(user);
+
     const token = jwt.sign(
       { _id: user._id },
       'some-secret-key',
@@ -102,8 +102,8 @@ function login(req, res, next) {
     res.send({ token });
   })
     .catch((err) => {
-      return next(new UnauthorizedError('Ошибка'));
-    });
+      res.status(401).send({ message: err.message })
+  });
 };
 
 function getCurrentUser(req, res, next) {
