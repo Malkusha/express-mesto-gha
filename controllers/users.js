@@ -27,6 +27,7 @@ function getUserById(req, res, next) {
         throw new NotFoundError('Пользователь не найден');
       }
       return res.status(200).send({
+        email: user.email,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
@@ -49,13 +50,13 @@ function createUser(req, res, next) {
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
     })
-    .then((user) =>  res.status(201).send({
+    .then(() =>  res.status(201).send({
       name, about, avatar, email
     }))
     .catch((err) => {
-      if (err.code === 11000 || MongoServerError.message.includes('E11000 duplicate key error')) {
-        return next(new ConflictError('Пользователь с такой почтой уже существует'));
-      }
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с такой почтой уже существует'))
+      } else
       if (err.name === "ValidationError") {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
