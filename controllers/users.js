@@ -48,11 +48,16 @@ function createUser(req, res, next) {
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash })
+      return User.create({ name, about, avatar, email, password: hash })
     })
-    .then(() =>  res.status(201).send({
-      name, about, avatar, email
-    }))
+    .then((user) => {
+      if (!user) {
+        throw new ConflictError('Пользователь с такой почтой уже существует')
+      }
+      res.status(201).send({
+        name, about, avatar, email
+      })
+    })
     .catch((err) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с такой почтой уже существует'))
