@@ -43,7 +43,10 @@ function deleteCardById(req, res, next) {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      if (err.name === "ServerError") {
+        return next(new ServerError(`Произошла ошибка: ${err}`))
+      }
+      next();
     });
 }
 

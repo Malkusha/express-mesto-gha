@@ -20,6 +20,7 @@ function getUsers(req, res, next) {
 
 function getUserById(req, res, next) {
   const { userId } = req.params;
+  console.log(userId);
   User.findById(userId)
     .then((user) => {
       if (!user) {
@@ -35,8 +36,10 @@ function getUserById(req, res, next) {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID'));
       }
+      if (err.name === "ServerError") {
+        return next(new ServerError(`Произошла ошибка: ${err}`));
+      }
       next();
-      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
