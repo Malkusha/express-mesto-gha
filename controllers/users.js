@@ -23,15 +23,20 @@ function getUserById(req, res, next) {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        throw new NotFoundError('Пользователь не найден');
       }
-      return res.status(200).send(user);
+      return res.status(200).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      });
     })
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      next();
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
@@ -46,11 +51,12 @@ function createUser(req, res, next) {
     }))
     .catch((err) => {
       if (err.code === 11000 || MongoServerError.message.includes('E11000 duplicate key error')) {
-        return next(new ConflictError('Пользователь с такой почтой уже существует'));
+        throw new ConflictError('Пользователь с такой почтой уже существует');
       }
       if (err.name === "ValidationError") {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
+      next();
       return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }

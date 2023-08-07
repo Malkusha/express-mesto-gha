@@ -32,10 +32,10 @@ function deleteCardById(req, res, next) {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError('Карточка не найдена'));
+        throw new NotFoundError('Карточка не найдена');
       }
       if (card.owner._id.toString() !== req.user._id.toString()) {
-        return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))
+        throw new AccessError('Нельзя удалить карточку, загруженную другим пользователем')
       }
       return res.send({ data: card });
     })
@@ -43,6 +43,7 @@ function deleteCardById(req, res, next) {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
+      next();
       return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
@@ -63,6 +64,7 @@ function setLike(req, res, next) {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
+      next();
       return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
@@ -83,6 +85,7 @@ function removeLike(req, res, next) {
       if (err.name === "CastError") {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
+      next();
       return next(new ServerError(`Произошла ошибка: ${err}`))
     });
 }
