@@ -9,7 +9,7 @@ const {
 function getCards(req, res, next) {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => next(new ServerError('Произошла ошибка')));
+    .catch(() => next(new ServerError('Произошла ошибка')));
 }
 
 function createCard(req, res, next) {
@@ -35,8 +35,8 @@ function deleteCardById(req, res, next) {
         throw new AccessError('Нельзя удалить карточку, загруженную другим пользователем');
       }
       card.deleteOne()
-        .then(() => res.send({ message: 'Карточка удалена'}))
-        .catch(next)
+        .then(() => res.send({ message: 'Карточка удалена' }))
+        .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -63,7 +63,7 @@ function setLike(req, res, next) {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
-      next(err);
+      return next(err);
     });
 }
 
@@ -83,7 +83,7 @@ function removeLike(req, res, next) {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
-      next(err);
+      return next(err);
     });
 }
 

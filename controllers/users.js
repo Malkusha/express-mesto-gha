@@ -11,13 +11,12 @@ const {
 
 function getUsers(req, res, next) {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.status(200).send({ data: users }))
     .catch((err) => next(new ServerError('Произошла ошибка')));
 }
 
 function getUserById(req, res, next) {
   const { userId } = req.params;
-  console.log(userId);
   User.findById(userId)
     .then((user) => {
       if (!user) {
@@ -34,7 +33,7 @@ function getUserById(req, res, next) {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID'));
       }
-      next(err);
+      return next(err);
     });
 }
 
@@ -46,7 +45,7 @@ function createUser(req, res, next) {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => {
+    .then(() => {
       res.status(201).send({
         name, about, avatar, email,
       });
@@ -57,7 +56,7 @@ function createUser(req, res, next) {
       } if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 }
 
@@ -74,7 +73,7 @@ function updateUser(req, res, next) {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 }
 
@@ -91,11 +90,11 @@ function updateAvatar(req, res, next) {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 }
 
-function login(req, res) {
+function login(req, res, next) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -127,7 +126,7 @@ function getCurrentUser(req, res, next) {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID'));
       }
-      next(err);
+      return next(err);
     });
 }
 
