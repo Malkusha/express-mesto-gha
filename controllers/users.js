@@ -12,7 +12,7 @@ const {
 function getUsers(req, res, next) {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => next(new ServerError('Произошла ошибка')));
+    .catch(() => next(new ServerError('Произошла ошибка')));
 }
 
 function getUserById(req, res, next) {

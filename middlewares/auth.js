@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
-    res.status(401).send({ message: err.message })
+    res.status(401).send({ message: err.message });
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
