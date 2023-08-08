@@ -1,18 +1,15 @@
-const Card = require("../models/card");
+const Card = require('../models/card');
 const {
   NotFoundError,
   BadRequestError,
-  ConflictError,
   ServerError,
-  AccessError
-} = require("../errors/index");
+  AccessError,
+} = require('../errors/index');
 
 function getCards(req, res, next) {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => {
-      return next(new ServerError(`Произошла ошибка: ${err}`))
-    })
+    .catch((err) => next(new ServerError(`Произошла ошибка: ${err}`)));
 }
 
 function createCard(req, res, next) {
@@ -20,10 +17,10 @@ function createCard(req, res, next) {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
@@ -35,16 +32,16 @@ function deleteCardById(req, res, next) {
         throw new NotFoundError('Карточка не найдена');
       }
       if (card.owner._id.toString() !== req.user._id.toString()) {
-        return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'))
+        return next(new AccessError('Нельзя удалить карточку, загруженную другим пользователем'));
       }
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
-      if (err.name === "ServerError") {
-        return next(new ServerError(`Произошла ошибка: ${err}`))
+      if (err.name === 'ServerError') {
+        return next(new ServerError(`Произошла ошибка: ${err}`));
       }
       next();
     });
@@ -60,14 +57,14 @@ function setLike(req, res, next) {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       }
-      res.send({ message: "Карточка удалена" });
+      res.send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
       next();
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
@@ -84,11 +81,11 @@ function removeLike(req, res, next) {
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID карточки'));
       }
       next();
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 

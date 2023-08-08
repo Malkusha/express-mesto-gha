@@ -1,21 +1,18 @@
-const User = require("../models/user");
 const jwt = require('jsonwebtoken');
-const bcrypt = require("bcryptjs");
+const bcrypt = require('bcryptjs');
+const User = require('../models/user');
 
 const {
   NotFoundError,
   BadRequestError,
   ConflictError,
   ServerError,
-  UnauthorizedError
-} = require("../errors/index");
+} = require('../errors/index');
 
 function getUsers(req, res, next) {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => {
-      return next(new ServerError(`Произошла ошибка: ${err}`))
-    });
+    .catch((err) => next(new ServerError(`Произошла ошибка: ${err}`)));
 }
 
 function getUserById(req, res, next) {
@@ -34,10 +31,10 @@ function getUserById(req, res, next) {
       });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID'));
       }
-      if (err.name === "ServerError") {
+      if (err.name === 'ServerError') {
         return next(new ServerError(`Произошла ошибка: ${err}`));
       }
       next();
@@ -45,27 +42,28 @@ function getUserById(req, res, next) {
 }
 
 function createUser(req, res, next) {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt.hash(password, 10)
-    .then((hash) => {
-      return User.create({ name, about, avatar, email, password: hash })
-    })
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => {
       if (!user) {
-        throw new ConflictError('Пользователь с такой почтой уже существует')
+        throw new ConflictError('Пользователь с такой почтой уже существует');
       }
       res.status(201).send({
-        name, about, avatar, email
-      })
+        name, about, avatar, email,
+      });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new ConflictError('Пользователь с такой почтой уже существует'))
-      } else
-      if (err.name === "ValidationError") {
+        return next(new ConflictError('Пользователь с такой почтой уже существует'));
+      } if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
@@ -79,10 +77,10 @@ function updateUser(req, res, next) {
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
@@ -96,29 +94,28 @@ function updateAvatar(req, res, next) {
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
-function login(req, res, next) {
+function login(req, res) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
-  .then((user) => {
-
-    const token = jwt.sign(
-      { _id: user._id },
-      'some-secret-key',
-      { expiresIn: '7d' },
-    );
-    res.send({ token });
-  })
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    })
     .catch((err) => {
-      res.status(401).send({ message: err.message })
-  });
-};
+      res.status(401).send({ message: err.message });
+    });
+}
 
 function getCurrentUser(req, res, next) {
   const id = req.user._id;
@@ -135,10 +132,10 @@ function getCurrentUser(req, res, next) {
       });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`))
+      return next(new ServerError(`Произошла ошибка: ${err}`));
     });
 }
 
@@ -149,5 +146,5 @@ module.exports = {
   updateUser,
   updateAvatar,
   login,
-  getCurrentUser
+  getCurrentUser,
 };
