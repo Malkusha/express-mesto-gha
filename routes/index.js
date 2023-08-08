@@ -6,7 +6,7 @@ const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const usersRouter = require('./users');
 const cardsRouter = require('./cards');
-const { UnauthorizedError } = require('../errors/index');
+const { NotFoundError } = require('../errors/index');
 
 router.post(
   '/signin',
@@ -36,7 +36,7 @@ router.use('/users', auth, usersRouter);
 router.use('/cards', auth, cardsRouter);
 
 router.use((req, res, next) => {
-  next(new UnauthorizedError(`Ресурс по адресу ${req.path} не найден`));
+  next(new NotFoundError(`Ресурс по адресу ${req.path} не найден`));
 });
 
 module.exports = router;
