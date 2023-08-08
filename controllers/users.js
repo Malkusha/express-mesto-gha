@@ -11,8 +11,8 @@ const {
 
 function getUsers(req, res, next) {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => next(new ServerError(`Произошла ошибка: ${err}`)));
+    .then((users) => res.send({ data: users }))
+    .catch((err) => next(new ServerError('Произошла ошибка')));
 }
 
 function getUserById(req, res, next) {
@@ -34,10 +34,7 @@ function getUserById(req, res, next) {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID'));
       }
-      if (err.name === 'ServerError') {
-        return next(new ServerError(`Произошла ошибка: ${err}`));
-      }
-      next();
+      next(err);
     });
 }
 
@@ -50,9 +47,6 @@ function createUser(req, res, next) {
       name, about, avatar, email, password: hash,
     }))
     .then((user) => {
-      if (!user) {
-        throw new ConflictError('Пользователь с такой почтой уже существует');
-      }
       res.status(201).send({
         name, about, avatar, email,
       });
@@ -63,7 +57,7 @@ function createUser(req, res, next) {
       } if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`));
+      next(err);
     });
 }
 
@@ -74,13 +68,13 @@ function updateUser(req, res, next) {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`));
+      next(err);
     });
 }
 
@@ -91,13 +85,13 @@ function updateAvatar(req, res, next) {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`));
+      next(err);
     });
 }
 
@@ -112,9 +106,7 @@ function login(req, res) {
       );
       res.send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+    .catch(next);
 }
 
 function getCurrentUser(req, res, next) {
@@ -135,7 +127,7 @@ function getCurrentUser(req, res, next) {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный ID'));
       }
-      return next(new ServerError(`Произошла ошибка: ${err}`));
+      next(err);
     });
 }
 
